@@ -25,17 +25,31 @@
             <button type="submit"><i>whoosh</i> ⊹ ࣪ ˖</button>
         </form>
     </div>
+    <div id="ideas-container">
+        <h3>plot notes .✦ ݁˖</h3>
+        <textarea id="user-ideas" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
+        <button id="save-btn">save ⋆.˚⭒⋆</button>
+    </div>
 </body>
 <script>
-        let pages = [ // array to hold the pages of the story
-            {id: null, title: "nameless ✶⋆.˚", historyHtml: ""}
+        let pages = JSON.parse(localStorage.getItem('starlit_pages')) || [ // array to hold the pages of the story
+            {id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""}
         ];
+
+        function saveToLocalStorage(){
+            localStorage.setItem('starlit_pages',JSON.stringify(pages));
+        }
+
         let currentPageIndex = 0; // index of the current page
 
         const chatOutput = document.getElementById("chat-output");
         const pageIndicator = document.getElementById("pg-indicator");
         const storyTitle = document.getElementById("story-title");
 
+        // gets the ideas that the user puts in their notes for saving it
+        const userIdeasInput = document.getElementById("user-ideas");
+        const saveBtn = document.getElementById("save-btn")
+       
         // function to render the current page
         function renderCurrentPage(){
             const currentPage = pages[currentPageIndex];
@@ -50,7 +64,21 @@
             // disables nav if at start or end because duh
             document.getElementById("prev-pg").disabled = currentPageIndex === 0;
             document.getElementById("next-pg").disabled = currentPageIndex === pages.length - 1;
+        
+            userIdeasInput.value = currentPage.ideas || "";
         }
+        
+        // this baby saves the notes the user made ;)
+        saveBtn.addEventListener('click',function() {
+            pages[currentPageIndex].ideas = userIdeasInput.value;
+            saveToLocalStorage();
+
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = "saved ՞. .՞𐦯"
+            setTimeout(() => { // basically flashes the saved text for a couple milisecs
+                saveBtn.innerText = originalText;
+            }, 1500);
+        });
         
         // page flip to previous page
         document.getElementById("prev-pg").addEventListener('click', function(){
@@ -73,6 +101,7 @@
             const newIndex = pages.length;
             pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: ""});
             currentPageIndex = newIndex;
+            saveToLocalStorage();
             renderCurrentPage();
         });
 
@@ -88,9 +117,9 @@
             if (!userMessage) return;
 
             // 1. Show your message in the chat immediately
-            outputDiv.innerHTML += `<p><b>You:</b> ${userMessage}</p>`;
+            outputDiv.innerHTML += `<p><b>user ✭ :</b> ${userMessage}</p>`;
             pages[currentPageIndex].historyHtml = outputDiv.innerHTML; 
-
+            saveToLocalStorage();
             // 2. Clear input field and show temporary loading message
 
             inputField.value = "";
@@ -118,8 +147,9 @@
                 
                 // 5. Remove loading text and append Starry's response
                 document.getElementById("loading-text").remove();
-                outputDiv.innerHTML += `<p><b>Starry:</b> ${data.response}</p>`;
+                outputDiv.innerHTML += `<p><b>starry ✭ :</b> ${data.response}</p>`;
                 pages[currentPageIndex].historyHtml = outputDiv.innerHTML;
+                saveToLocalStorage();
 
             } catch (error) {
                 console.error("Error:", error);
