@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head> <!-- this is the html file that helps set up the front end of the app! -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</title>
+</head>
+<body> 
+    <div>
+        <!--book nav-->
+        <div id="book-nav">
+            <button id="prev-pg">&larr; previous</button>
+            <span id="pg-indicator">1 / 1</span>
+            <button id="next-pg">next &rarr;</button> 
+        </div>
+    </div>
+    <div> <!-- this is the main container for the chat interface -->
+        <h1 id="story-title">ready for a new journey? ‧₊˚✩彡</h1>
+        <!-- new story button -->
+        <button id="new-story-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
+        <!-- chat output area -->
+        <div id="chat-output"></div>
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="write your message..." />
+            <button type="submit"><i>whoosh</i> ⊹ ࣪ ˖</button>
+        </form>
+    </div>
+</body>
+<script>
+        let pages = [ // array to hold the pages of the story
+            {id: null, title: "nameless ✶⋆.˚", historyHtml: ""}
+        ];
+        let currentPageIndex = 0; // index of the current page
+
+        const chatOutput = document.getElementById("chat-output");
+        const pageIndicator = document.getElementById("pg-indicator");
+        const storyTitle = document.getElementById("story-title");
+
+        // function to render the current page
+        function renderCurrentPage(){
+            const currentPage = pages[currentPageIndex];
+
+            // update the chat output and page indicator
+            chatOutput.innerHTML = currentPage.historyHtml;
+
+            // update the story title
+            storyTitle.innerText = currentPage.title;
+            pageIndicator.innerText = `${currentPageIndex + 1} / ${pages.length}`;
+        
+            // disables nav if at start or end because duh
+            document.getElementById("prev-pg").disabled = currentPageIndex === 0;
+            document.getElementById("next-pg").disabled = currentPageIndex === pages.length - 1;
+        }
+        
+        // page flip to previous page
+        document.getElementById("prev-pg").addEventListener('click', function(){
+            if(currentPageIndex > 0){
+                currentPageIndex--;
+                renderCurrentPage();
+            }
+        });
+
+        // page flip to next page
+        document.getElementById("next-pg").addEventListener('click', function(){
+            if(currentPageIndex < pages.length - 1){
+                currentPageIndex++;
+                renderCurrentPage();
+            }
+        });
+
+        // blank page for new story
+        document.getElementById("new-story-btn").addEventListener('click', function(){
+            const newIndex = pages.length;
+            pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: ""});
+            currentPageIndex = newIndex;
+            renderCurrentPage();
+        });
+
+
+        // handles message submission and response from the backend 
+        document.getElementById("chat-form").addEventListener('submit', async function(event){
+            event.preventDefault(); // Prevents page reload
+            
+            const inputField = document.getElementById("user-input");
+            const outputDiv = document.getElementById("chat-output");
+            const userMessage = inputField.value.trim();
+
+            if (!userMessage) return;
+
+            // 1. Show your message in the chat immediately
+            outputDiv.innerHTML += `<p><b>You:</b> ${userMessage}</p>`;
+            pages[currentPageIndex].historyHtml = outputDiv.innerHTML; 
+
+            // 2. Clear input field and show temporary loading message
+
+            inputField.value = "";
+            const loadingMsg = document.createElement("p");
+            loadingMsg.id = "loading-text";
+            loadingMsg.innerHTML = `<i>"shush now, starry is thinking...". ⋆⭒˚｡⋆</i>`;
+            outputDiv.appendChild(loadingMsg);
+
+            try {
+                // 3. Fetch reply from backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_input: userMessage, chat_id: pages[currentPageIndex].id })
+                });
+
+                const data = await response.json();
+
+                //4. save the chat id for future messages
+                if (data.chat_id) {
+                    pages[currentPageIndex].id = data.chat_id;
+                }
+                
+                // 5. Remove loading text and append Starry's response
+                document.getElementById("loading-text").remove();
+                outputDiv.innerHTML += `<p><b>Starry:</b> ${data.response}</p>`;
+                pages[currentPageIndex].historyHtml = outputDiv.innerHTML;
+
+            } catch (error) {
+                console.error("Error:", error);
+                if (document.getElementById("loading-text")) {
+                    document.getElementById("loading-text").remove();
+                }
+                outputDiv.innerHTML += `<p style="color: red;"><b>Starry:</b> Oops, something went wrong connecting to the backend!</p>`;
+                pages[currentPageIndex].historyHtml = outputDiv.innerHTML;
+            }
+        }); 
+        
+        renderCurrentPage(); // Initial render of the first page
+
+    </script>
+</html>
