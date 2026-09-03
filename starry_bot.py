@@ -1,6 +1,7 @@
 # these lines of code help set up the env. variables needed for the ai to run!
 import os
 import uuid
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -30,9 +31,9 @@ def home():
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        request_data = request.get_json()
-        user_input = request_data.get('user_input', '')
-        chat_id = request_data.get('chat_id')
+        user_input = request.form.get('user_input', '')
+        chat_id = request.form.get('chat_id')
+        image_file = request.files.get('image')
 
         # no chat id means a new chat sesh
         if not chat_id or chat_id not in sessions:
@@ -47,16 +48,27 @@ def chat():
         
         #get chat sesh for specific window
         chat_session = sessions[chat_id]
-        #send msg in the exsisting coversestion context
-        response = chat_session.send_message(user_input)
+
 
         print(f"created new session: {chat_id}") # Debug print
+        max_retries = 3
+        for attempt in range(max_retries):  
+            try:
+                #send msg in the exsisting coversestion context
+                contents = []
+                if image_file:
+                    contents.append(types.Part.from_bytes(data=image_file.read(), mime_type=image_file.mimetype))
+                if user_input:
+                    contents.append(user_input)
 
-
-        return jsonify({
-            'response': response.text,
-            'chat_id': chat_id
-        })
+                response = chat_session.send_message(contents)
+                return jsonify({
+                    'response': response.text,
+                    'chat_id': chat_id
+                })
+            except Exception as inner_e:
+                print(f"Error on attempt {attempt + 1}: {inner_e}")
+                continue
 
     except Exception as e:
         print(f"Error handling chat request: {e}")

@@ -4,37 +4,100 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <style>
+        .page-shell {
+            --bg-image: url('/static/starrybg.png');
+            font-family: 'UnifrakturMaguntia', cursive;
+            background-color: #0b0c1a;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .chat-panel {
+            border: 2px solid rgba(255,255,255,0.7);
+            padding: 20px;
+            border-radius: 18px;
+            margin: 20px 20px 20px auto;
+            width: min(420px, 82vw);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-sizing: border-box;
+            background: rgba(10, 12, 26, 0.72);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .chat-panel h1 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .story-title {
+            outline: none;
+            cursor: text;
+            min-height: 1.5em;
+        }
+    </style>
 </head>
-<body> 
-    <div>
+<body class="page-shell">
+    <h1 class="main-title">⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</h1>
+    <div class="book-nav-wrap">
         <!--book nav-->
-        <div id="book-nav">
-            <button id="prev-pg">&larr; previous</button>
-            <span id="pg-indicator">1 / 1</span>
-            <button id="next-pg">next &rarr;</button> 
+        <div id="book-nav" class="book-nav">
+            <button id="prev-pg" class="nav-btn prev-btn">&larr; previous</button>
+            <span id="pg-indicator" class="page-indicator">1 / 1</span>
+            <button id="next-pg" class="nav-btn next-btn">next &rarr;</button>
         </div>
     </div>
-    <div> <!-- this is the main container for the chat interface -->
-        <h1 id="story-title">ready for a new journey? ‧₊˚✩彡</h1>
+    <div class="chat-panel"> <!-- this is the main container for the chat interface -->
+        <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
         <!-- new story button -->
-        <button id="new-story-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
+        <button id="new-story-btn" class="primary-btn new-story-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
         <!-- chat output area -->
-        <div id="chat-output"></div>
-        <form id="chat-form">
-            <input type="text" id="user-input" placeholder="write your message..." />
-            <button type="submit"><i>whoosh</i> ⊹ ࣪ ˖</button>
+        <div id="chat-output" class="chat-output"></div>
+        <form id="chat-form" class="chat-form">
+            <input type="file" id="img-input" class="image-input" accept="image/*" style="display: none;">
+            <button type="button" id="img-upload-btn" class="upload-btn"> image uploads ⋆.˚⭒⋆ </button>
+            <span id="file-name" class="file-name"></span>
+
+            <input type="text" id="user-input" class="message-input" placeholder="write your message..." />
+            <button type="submit" class="send-btn"><i>whoosh</i> ⊹ ࣪ ˖</button>
         </form>
     </div>
-    <div id="ideas-container">
-        <h3>plot notes .✦ ݁˖</h3>
-        <textarea id="user-ideas" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
-        <button id="save-btn">save ⋆.˚⭒⋆</button>
+    <div id="ideas-container" class="ideas-container">
+        <h3 class="notes-title">plot notes .✦ ݁˖</h3>
+        <textarea id="user-ideas" class="ideas-textarea" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
+        <button id="save-btn" class="save-btn">save ⋆.˚⭒⋆</button>
     </div>
 </body>
 <script>
         let pages = JSON.parse(localStorage.getItem('starlit_pages')) || [ // array to hold the pages of the story
             {id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""}
         ];
+
+        function normalizeTitle(title) {
+            return (title && title.trim()) ? title.trim() : 'nameless ✶⋆.˚';
+        }
 
         function saveToLocalStorage(){
             localStorage.setItem('starlit_pages',JSON.stringify(pages));
@@ -46,10 +109,40 @@
         const pageIndicator = document.getElementById("pg-indicator");
         const storyTitle = document.getElementById("story-title");
 
+        storyTitle.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                storyTitle.blur();
+            }
+        });
+
+        storyTitle.addEventListener('blur', function() {
+            const updatedTitle = storyTitle.textContent.trim() || 'nameless ✶⋆.˚';
+            pages[currentPageIndex].title = updatedTitle;
+            saveToLocalStorage();
+        });
+
         // gets the ideas that the user puts in their notes for saving it
         const userIdeasInput = document.getElementById("user-ideas");
         const saveBtn = document.getElementById("save-btn")
        
+        // helps with uploading img!
+        const imageInput = document.getElementById("img-input");
+        const fileNameSpan = document.getElementById("file-name");
+        const imgUploadBtn = document.getElementById("img-upload-btn");
+
+        imgUploadBtn.addEventListener("click", function(){
+            imageInput.click();
+        });
+
+        imageInput.addEventListener("change", function(){
+            if (imageInput.files.length > 0) {
+                fileNameSpan.textContent = '[${imageInput.files[0].name}]';
+            } else {
+                fileNameSpan.textContent = "";
+            }
+        });
+
         // function to render the current page
         function renderCurrentPage(){
             const currentPage = pages[currentPageIndex];
@@ -58,7 +151,8 @@
             chatOutput.innerHTML = currentPage.historyHtml;
 
             // update the story title
-            storyTitle.innerText = currentPage.title;
+            pages[currentPageIndex].title = normalizeTitle(pages[currentPageIndex].title);
+            storyTitle.innerText = pages[currentPageIndex].title;
             pageIndicator.innerText = `${currentPageIndex + 1} / ${pages.length}`;
         
             // disables nav if at start or end because duh
@@ -99,7 +193,7 @@
         // blank page for new story
         document.getElementById("new-story-btn").addEventListener('click', function(){
             const newIndex = pages.length;
-            pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: ""});
+            pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""});
             currentPageIndex = newIndex;
             saveToLocalStorage();
             renderCurrentPage();
@@ -130,12 +224,16 @@
 
             try {
                 // 3. Fetch reply from backend
+                const formData = new FormData();
+                formData.append('user_input', userMessage);
+                formData.append('chat_id', pages[currentPageIndex].id);
+                if (imageInput.files.length > 0) {
+                    formData.append('image', imageInput.files[0]);
+                }
+
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ user_input: userMessage, chat_id: pages[currentPageIndex].id })
+                    body: formData
                 });
 
                 const data = await response.json();
