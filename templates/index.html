@@ -9,58 +9,79 @@
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
         .page-shell {
-            --bg-image: url('/static/starrybg.png');
-            font-family: 'UnifrakturMaguntia', cursive;
-            background-color: #0b0c1a;
-            background-image: var(--bg-image);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            --font: 'UnifrakturMaguntia', cursive;
+            --border: #846C58;
+            --glass: rgba(255, 255, 255, 0.08);
+            font-family: var(--font);
+            background: #0b0c1a url('/static/starrybg.png') center / cover fixed no-repeat;
             color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            box-sizing: border-box;
+            margin: 0; padding: 20px; min-height: 100vh; box-sizing: border-box;
         }
-        
+
         .main-title {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            font-weight: normal;
+            text-align: center; font-size: 2.5em; margin-bottom: 20px; font-weight: normal;
         }
 
         .chat-panel {
-            border: 2px solid rgba(255,255,255,0.7);
-            padding: 20px;
-            border-radius: 18px;
-            margin: 20px 20px 20px auto;
-            width: min(420px, 82vw);
-            min-height: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-sizing: border-box;
-            background: rgba(10, 12, 26, 0.72);
-            backdrop-filter: blur(6px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            border: 2px solid var(--border); padding: 20px; border-radius: 18px;
+            margin: 20px 20px 20px auto; width: min(420px, 82vw); min-height: 600px;
+            display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;
+            background: rgba(10, 12, 26, 0.72); backdrop-filter: blur(6px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
         .chat-panel h1 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
+            font-size: 1.5em; margin-bottom: 10px;
         }
 
         .story-title {
-            outline: none;
-            cursor: text;
-            min-height: 1.5em;
+            outline: none; cursor: text; min-height: 1.5em;
+        }
+
+        .primary-btn, .message-input {
+            font-family: var(--font);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .primary-btn {
+            background: #23233c; color: #9b8877; border: 3px solid var(--border);
+            outline: 1px solid rgba(245, 214, 179, 0.45);
+            padding: 8px 14px; text-align: center; font-size: 16px; cursor: pointer;
+            width: fit-content; margin: 0 auto;
+        }
+
+        .message-input {
+            flex: 1; background: var(--glass); padding: 8px;
+        }
+
+        .chat-output {
+            flex: 1; min-height: 120px; display: flex; flex-direction: column;
+            gap: 8px; overflow-y: auto; padding-right: 4px;
+        }
+
+        .chat-output p {
+            margin: 0; max-width: 80%; padding: 10px 12px; border-radius: 16px;
+            line-height: 1.4; overflow-wrap: break-word;
+        }
+
+        .chat-output .user-msg {
+            align-self: flex-start; background: var(--glass); border-bottom-left-radius: 6px;
+        }
+
+        .chat-output .starry-msg {
+            align-self: flex-end; background: rgba(132, 99, 88, 0.9); border-bottom-right-radius: 6px;
+        }
+
+        .chat-form {
+            margin-top: auto; display: flex; align-items: center; gap: 8px;
         }
     </style>
 </head>
 <body class="page-shell">
     <h1 class="main-title">⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</h1>
+    <!-- new story button -->
+    <button id="new-story-btn" class="primary-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
     <div class="book-nav-wrap">
         <!--book nav-->
         <div id="book-nav" class="book-nav">
@@ -71,8 +92,6 @@
     </div>
     <div class="chat-panel"> <!-- this is the main container for the chat interface -->
         <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
-        <!-- new story button -->
-        <button id="new-story-btn" class="primary-btn new-story-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
         <!-- chat output area -->
         <div id="chat-output" class="chat-output"></div>
         <form id="chat-form" class="chat-form">
@@ -211,7 +230,7 @@
             if (!userMessage) return;
 
             // 1. Show your message in the chat immediately
-            outputDiv.innerHTML += `<p><b>user ✭ :</b> ${userMessage}</p>`;
+            outputDiv.innerHTML += `<p class="user-msg"><b>user ✭ :</b> ${userMessage}</p>`;
             pages[currentPageIndex].historyHtml = outputDiv.innerHTML; 
             saveToLocalStorage();
             // 2. Clear input field and show temporary loading message
@@ -245,7 +264,7 @@
                 
                 // 5. Remove loading text and append Starry's response
                 document.getElementById("loading-text").remove();
-                outputDiv.innerHTML += `<p><b>starry ✭ :</b> ${data.response}</p>`;
+                outputDiv.innerHTML += `<p class="starry-msg"><b>starry ✭ :</b> ${data.response}</p>`;
                 pages[currentPageIndex].historyHtml = outputDiv.innerHTML;
                 saveToLocalStorage();
 
