@@ -22,9 +22,15 @@
             text-align: center; font-size: 2.5em; margin-bottom: 20px; font-weight: normal;
         }
 
+        .content-row {
+            display: flex; justify-content: center; align-items: flex-end; gap: 60px;
+            margin: 20px auto 0; width: min(1260px, 96vw);
+            flex-direction: row-reverse;
+        }
+
         .chat-panel {
             border: 2px solid var(--border); padding: 20px; border-radius: 18px;
-            margin: 20px 20px 20px auto; width: min(420px, 82vw); min-height: 600px;
+            width: min(520px, 50vw); min-height: 600px;
             display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;
             background: rgba(10, 12, 26, 0.72); backdrop-filter: blur(6px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -44,15 +50,12 @@
             border-radius: 12px;
         }
 
-        .primary-btn {
-            background: #23233c; color: #9b8877; border: 3px solid var(--border);
-            outline: 1px solid rgba(245, 214, 179, 0.45);
-            padding: 8px 14px; text-align: center; font-size: 16px; cursor: pointer;
-            width: fit-content; margin: 0 auto;
+        .message-input {
+            flex: 1; background: #554C5B; padding: 8px;
         }
 
-        .message-input {
-            flex: 1; background: var(--glass); padding: 8px;
+        .message-input::placeholder {
+            color: #d1c4b2; font-style: italic;
         }
 
         .chat-output {
@@ -62,7 +65,7 @@
 
         .chat-output p {
             margin: 0; max-width: 80%; padding: 10px 12px; border-radius: 16px;
-            line-height: 1.4; overflow-wrap: break-word;
+            line-height: 1.4; overflow-wrap: break-word; color: #d1c4b2;
         }
 
         .chat-output .user-msg {
@@ -75,6 +78,37 @@
 
         .chat-form {
             margin-top: auto; display: flex; align-items: center; gap: 8px;
+        }
+
+        .send-btn, .upload-btn, .primary-btn, .save-btn {
+            background: #23233c; color: #9b8877; border: 1px solid var(--border);
+            outline: 1px solid rgba(245, 214, 179, 0.45);
+            padding: 8px 14px; text-align: center; font-size: 16px; cursor: pointer;
+            font-family: var(--font); border-radius: 12px;
+        }
+
+        .ideas-container {
+            border: 2px solid var(--border); padding: 18px; border-radius: 18px;
+            width: min(620px, 58vw); min-height: 420px; box-sizing: border-box;
+            display: flex; flex-direction: column; gap: 12px;
+            background: rgba(10, 12, 26, 0.72); backdrop-filter: blur(6px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            align-self: flex-end; margin-right: 0;
+        }
+
+        .notes-title {
+            margin: 0; font-size: 1.1em;
+        }
+
+        .ideas-textarea {
+            width: 100%; flex: 1; min-height: 260px; resize: vertical;
+            border: 1px solid var(--border); border-radius: 12px; padding: 10px;
+            background: #554C5B; color: #f5f5f5; box-sizing: border-box;
+            font-family: var(--font); font-size: 0.95em;
+        }
+
+        .ideas-textarea::placeholder {
+            color: #d1c4b2; font-style: italic;
         }
     </style>
 </head>
@@ -90,23 +124,25 @@
             <button id="next-pg" class="nav-btn next-btn">next &rarr;</button>
         </div>
     </div>
-    <div class="chat-panel"> <!-- this is the main container for the chat interface -->
-        <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
-        <!-- chat output area -->
-        <div id="chat-output" class="chat-output"></div>
-        <form id="chat-form" class="chat-form">
-            <input type="file" id="img-input" class="image-input" accept="image/*" style="display: none;">
-            <button type="button" id="img-upload-btn" class="upload-btn"> image uploads ⋆.˚⭒⋆ </button>
-            <span id="file-name" class="file-name"></span>
+    <div class="content-row">
+        <div class="chat-panel"> <!-- this is the main container for the chat interface -->
+            <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
+            <!-- chat output area -->
+            <div id="chat-output" class="chat-output"></div>
+            <form id="chat-form" class="chat-form">
+                <input type="file" id="img-input" class="image-input" accept="image/*" style="display: none;">
+                <button type="button" id="img-upload-btn" class="upload-btn"> image uploads ⋆.˚⭒⋆ </button>
+                <span id="file-name" class="file-name"></span>
 
-            <input type="text" id="user-input" class="message-input" placeholder="write your message..." />
-            <button type="submit" class="send-btn"><i>whoosh</i> ⊹ ࣪ ˖</button>
-        </form>
-    </div>
-    <div id="ideas-container" class="ideas-container">
-        <h3 class="notes-title">plot notes .✦ ݁˖</h3>
-        <textarea id="user-ideas" class="ideas-textarea" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
-        <button id="save-btn" class="save-btn">save ⋆.˚⭒⋆</button>
+                <input type="text" id="user-input" class="message-input" placeholder="write your message..." />
+                <button type="submit" class="send-btn"><i>whoosh</i> ⊹ ࣪ ˖</button>
+            </form>
+        </div>
+        <div id="ideas-container" class="ideas-container">
+            <h3 class="notes-title">plot notes .✦ ݁˖</h3>
+            <textarea id="user-ideas" class="ideas-textarea" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
+            <button id="save-btn" class="save-btn">save ⋆.˚⭒⋆</button>
+        </div>
     </div>
 </body>
 <script>
