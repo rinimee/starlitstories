@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    //nummy styleeee (pretend im drooling or something idk)
     <style>
         .page-shell {
             --font: 'UnifrakturMaguntia', cursive;
@@ -23,14 +24,16 @@
         }
 
         .content-row {
-            display: flex; justify-content: center; align-items: flex-end; gap: 60px;
+            display: flex; justify-content: center; align-items: stretch; gap: 60px;
             margin: 20px auto 0; width: min(1260px, 96vw);
             flex-direction: row-reverse;
         }
 
         .chat-panel {
             border: 2px solid var(--border); padding: 20px; border-radius: 18px;
-            width: min(520px, 50vw); min-height: 600px;
+            width: min(520px, 50vw); height: 600px;
+            max-height: calc(100vh - 180px);
+            overflow: hidden;
             display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;
             background: rgba(10, 12, 26, 0.72); backdrop-filter: blur(6px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -59,8 +62,9 @@
         }
 
         .chat-output {
-            flex: 1; min-height: 120px; display: flex; flex-direction: column;
-            gap: 8px; overflow-y: auto; padding-right: 4px;
+            flex: 1; height: 0; min-height: 0; display: flex; flex-direction: column;
+            gap: 8px; overflow-y: scroll; padding-right: 4px;
+            scrollbar-color: var(--border) rgba(10, 12, 26, 0.35);
         }
 
         .chat-output p {
@@ -80,7 +84,7 @@
             margin-top: auto; display: flex; align-items: center; gap: 8px;
         }
 
-        .send-btn, .upload-btn, .primary-btn, .save-btn {
+        .send-btn, .upload-btn, .primary-btn, .save-btn, .delete-chat-btn {
             background: #23233c; color: #9b8877; border: 1px solid var(--border);
             outline: 1px solid rgba(245, 214, 179, 0.45);
             padding: 8px 14px; text-align: center; font-size: 16px; cursor: pointer;
@@ -89,11 +93,12 @@
 
         .ideas-container {
             border: 2px solid var(--border); padding: 18px; border-radius: 18px;
-            width: min(620px, 58vw); min-height: 420px; box-sizing: border-box;
+            width: min(620px, 58vw); height: 420px;
+            max-height: calc(100vh - 240px); box-sizing: border-box;
             display: flex; flex-direction: column; gap: 12px;
             background: rgba(10, 12, 26, 0.72); backdrop-filter: blur(6px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            align-self: flex-end; margin-right: 0;
+            align-self: flex-end; margin-right: 0; overflow-y: auto;
         }
 
         .notes-title {
@@ -101,7 +106,7 @@
         }
 
         .ideas-textarea {
-            width: 100%; flex: 1; min-height: 260px; resize: vertical;
+            width: 100%; flex: 1; min-height: 0; resize: none;
             border: 1px solid var(--border); border-radius: 12px; padding: 10px;
             background: #554C5B; color: #f5f5f5; box-sizing: border-box;
             font-family: var(--font); font-size: 0.95em;
@@ -110,42 +115,101 @@
         .ideas-textarea::placeholder {
             color: #d1c4b2; font-style: italic;
         }
+
+        .nav-btn.prev-btn, .nav-btn.next-btn {
+            background: #23233c; color: #9b8877; border: 1px solid var(--border);
+            outline: 1px solid rgba(245, 214, 179, 0.45);
+            padding: 6px 12px; text-align: center; font-size: 14px; cursor: pointer;
+            font-family: var(--font); border-radius: 10px;
+        }
+
+        .book-nav-wrap {
+            width: 100%; min-height: 120px; margin: 0 auto;
+            display: flex; align-items: center;
+            background: url('/static/scroll.png.png') center / 100% 100% no-repeat;
+        }
+
+        .book-nav {
+            width: 76%; margin: 0 auto; display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+        }
+
+        .page-indicator {
+            color: #5b3927; font-size: 1.1em;
+        }
+
+        .story-controls {
+            width: 100%; margin: 0 auto 4px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .ideas-column {
+            width: min(620px, 58vw); display: flex; flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-column {
+            width: min(520px, 50vw); display: flex; flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-column .chat-panel {
+            width: 100%;
+        }
+
+        .chat-note {
+            margin: 0; min-height: 34px; padding: 9px 4px; box-sizing: border-box;
+            color: #d1c4b2; text-align: center; display: flex; align-items: center;
+            justify-content: center;
+            font-family: var(--font); font-size: 0.9em; background: #554C5B; border-radius: 8px; border: 2px solid var(--border);
+        }
+
     </style>
 </head>
 <body class="page-shell">
     <h1 class="main-title">⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</h1>
-    <!-- new story button -->
-    <button id="new-story-btn" class="primary-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
-    <div class="book-nav-wrap">
-        <!--book nav-->
-        <div id="book-nav" class="book-nav">
-            <button id="prev-pg" class="nav-btn prev-btn">&larr; previous</button>
-            <span id="pg-indicator" class="page-indicator">1 / 1</span>
-            <button id="next-pg" class="nav-btn next-btn">next &rarr;</button>
-        </div>
-    </div>
     <div class="content-row">
-        <div class="chat-panel"> <!-- this is the main container for the chat interface -->
-            <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
-            <!-- chat output area -->
-            <div id="chat-output" class="chat-output"></div>
-            <form id="chat-form" class="chat-form">
-                <input type="file" id="img-input" class="image-input" accept="image/*" style="display: none;">
-                <button type="button" id="img-upload-btn" class="upload-btn"> image uploads ⋆.˚⭒⋆ </button>
-                <span id="file-name" class="file-name"></span>
+        <div class="chat-column">
+            <div class="chat-panel"> <!-- this is the main container for the chat interface -->
+                <h1 id="story-title" class="story-title" contenteditable="true" spellcheck="false">ready for a new journey? ‧₊˚✩彡</h1>
+                <!-- chat output area -->
+                <div id="chat-output" class="chat-output"></div>
+                <form id="chat-form" class="chat-form">
+                    <input type="file" id="img-input" class="image-input" accept="image/*" style="display: none;">
+                    <button type="button" id="img-upload-btn" class="upload-btn"> image uploads ⋆.˚⭒⋆ </button>
+                    <span id="file-name" class="file-name"></span>
 
-                <input type="text" id="user-input" class="message-input" placeholder="write your message..." />
-                <button type="submit" class="send-btn"><i>whoosh</i> ⊹ ࣪ ˖</button>
-            </form>
+                    <input type="text" id="user-input" class="message-input" placeholder="write your message..." />
+                    <button type="submit" class="send-btn"><i>whoosh</i> ⊹ ࣪ ˖</button>
+                </form>
+            </div>
+            <button id="delete-chat-btn" class="delete-chat-btn" type="button">delete page ⋆｡°✩</button>
+            // lil note because i love you guys and i want to give credit where credit is due~
+            <p id="chat-note" class="chat-note">made with love by rinimee ♡</p>
         </div>
-        <div id="ideas-container" class="ideas-container">
-            <h3 class="notes-title">plot notes .✦ ݁˖</h3>
-            <textarea id="user-ideas" class="ideas-textarea" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
-            <button id="save-btn" class="save-btn">save ⋆.˚⭒⋆</button>
+        <div class="ideas-column">
+            <div class="story-controls">
+                <!-- new story button -->
+                <button id="new-story-btn" class="primary-btn"> begin new journey ⊹ ࣪ ˖ ໒꒱</button>
+                <div class="book-nav-wrap">
+                    <!-- book nav -->
+                    <div id="book-nav" class="book-nav">
+                        <button id="prev-pg" class="nav-btn prev-btn">&larr; previous</button>
+                        <span id="pg-indicator" class="page-indicator">1 / 1</span>
+                        <button id="next-pg" class="nav-btn next-btn">next &rarr;</button>
+                    </div>
+                </div>
+            </div>
+            <div id="ideas-container" class="ideas-container">
+                <h3 class="notes-title">plot notes .✦ ݁˖</h3>
+                <textarea id="user-ideas" class="ideas-textarea" placeholder="now, what do 𝘺𝘰𝘶 think?"></textarea>
+                <button id="save-btn" class="save-btn">save ⋆.˚⭒⋆</button>
+            </div>
         </div>
     </div>
 </body>
 <script>
+    // this script handles the front end logic for the chat interface and story management~
         let pages = JSON.parse(localStorage.getItem('starlit_pages')) || [ // array to hold the pages of the story
             {id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""}
         ];
@@ -189,10 +253,10 @@
         imgUploadBtn.addEventListener("click", function(){
             imageInput.click();
         });
-
+        // updates the file name when its selected durrr
         imageInput.addEventListener("change", function(){
             if (imageInput.files.length > 0) {
-                fileNameSpan.textContent = '[${imageInput.files[0].name}]';
+                fileNameSpan.textContent = `[${imageInput.files[0].name}]`;
             } else {
                 fileNameSpan.textContent = "";
             }
@@ -228,6 +292,21 @@
                 saveBtn.innerText = originalText;
             }, 1500);
         });
+        // this baby deletes the current page when the user clicks the delete button
+        // this also took FOREVER to figure out how to do it without breaking the app so please be gentle with me ;-;
+        document.getElementById("delete-chat-btn").addEventListener("click", function(){
+            if (!confirm("delete this chat? starry will forgive you, dear ⋆⭒˚｡⋆")) return;
+
+            pages.splice(currentPageIndex, 1);
+            if (pages.length === 0) {
+                pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: "", chatNote: ""});
+            }
+            currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+            imageInput.value = "";
+            fileNameSpan.textContent = "";
+            saveToLocalStorage();
+            renderCurrentPage();
+        });
         
         // page flip to previous page
         document.getElementById("prev-pg").addEventListener('click', function(){
@@ -248,7 +327,7 @@
         // blank page for new story
         document.getElementById("new-story-btn").addEventListener('click', function(){
             const newIndex = pages.length;
-            pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""});
+            pages.push({id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: "", chatNote: ""});
             currentPageIndex = newIndex;
             saveToLocalStorage();
             renderCurrentPage();
