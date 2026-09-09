@@ -70,6 +70,11 @@ def chat():
                 print(f"Error on attempt {attempt + 1}: {inner_e}")
                 continue
 
+        return jsonify({
+            'response': 'Starry could not finish that message. Please try again in a moment.',
+            'chat_id': chat_id
+        }), 502
+
     except Exception as e:
         print(f"Error handling chat request: {e}")
         return jsonify({'response': f"Backend error: {str(e)}"}), 500

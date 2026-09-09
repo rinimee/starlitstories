@@ -3,11 +3,12 @@
 <head> <!-- this is the html file that helps set up the front end of the app! -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</title>
+    <title>starlit stories ⋆⭒˚.⋆</title>
+    <link rel="icon" type="image/jpeg" href="/static/starlit-stories-icon.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    //nummy styleeee (pretend im drooling or something idk)
+    <!--nummy styleeee (pretend im drooling or something idk) -->
     <style>
         .page-shell {
             --font: 'UnifrakturMaguntia', cursive;
@@ -20,7 +21,12 @@
         }
 
         .main-title {
-            text-align: center; font-size: 2.5em; margin-bottom: 20px; font-weight: normal;
+            display: flex; align-items: center; justify-content: center; gap: 14px;
+            margin-bottom: 20px; font-weight: normal;
+        }
+
+        .main-title img {
+            width: min(360px, 55vw); height: auto; display: block;
         }
 
         .content-row {
@@ -54,7 +60,7 @@
         }
 
         .message-input {
-            flex: 1; background: #554C5B; padding: 8px;
+            flex: 1; background: #554C5B; color: #f5f5f5; padding: 8px;
         }
 
         .message-input::placeholder {
@@ -158,7 +164,7 @@
         }
 
         .chat-note {
-            margin: 0; min-height: 34px; padding: 9px 4px; box-sizing: border-box;
+            margin: 0; min-height: 57px; padding: 9px 4px; box-sizing: border-box;
             color: #d1c4b2; text-align: center; display: flex; align-items: center;
             justify-content: center;
             font-family: var(--font); font-size: 0.9em; background: #554C5B; border-radius: 8px; border: 2px solid var(--border);
@@ -167,7 +173,11 @@
     </style>
 </head>
 <body class="page-shell">
-    <h1 class="main-title">⋆⭒˚.⋆ starlit stories ⋆⭒˚.⋆</h1>
+    <h1 class="main-title">
+        <span aria-hidden="true">⋆⭒˚.⋆</span>
+        <img src="/static/starlit-stories-title.png" alt="starlit stories">
+        <span aria-hidden="true">⋆⭒˚.⋆</span>
+    </h1>
     <div class="content-row">
         <div class="chat-column">
             <div class="chat-panel"> <!-- this is the main container for the chat interface -->
@@ -184,7 +194,7 @@
                 </form>
             </div>
             <button id="delete-chat-btn" class="delete-chat-btn" type="button">delete page ⋆｡°✩</button>
-            // lil note because i love you guys and i want to give credit where credit is due~
+            <!-- lil note because i love you guys and i want to give credit where credit is due~ -->
             <p id="chat-note" class="chat-note">made with love by rinimee ♡</p>
         </div>
         <div class="ideas-column">
@@ -371,6 +381,9 @@
                 });
 
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.response || `Chat request failed (${response.status})`);
+                }
 
                 //4. save the chat id for future messages
                 if (data.chat_id) {
@@ -388,8 +401,9 @@
                 if (document.getElementById("loading-text")) {
                     document.getElementById("loading-text").remove();
                 }
-                outputDiv.innerHTML += `<p style="color: red;"><b>Starry:</b> Oops, something went wrong connecting to the backend!</p>`;
+                outputDiv.innerHTML += `<p style="color: #d1c4b2;"><b>Starry:</b> ${error.message}</p>`;
                 pages[currentPageIndex].historyHtml = outputDiv.innerHTML;
+                saveToLocalStorage();
             }
         }); 
         
