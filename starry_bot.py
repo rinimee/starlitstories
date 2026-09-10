@@ -11,8 +11,8 @@ load_dotenv() # gets the super duper secret api key shh
 
 app = Flask(
     __name__,
-    template_folder='docs',
-    static_folder='docs/static',
+    template_folder='.',
+    static_folder='static',
     static_url_path='/static'
 )
 client = genai.Client()
