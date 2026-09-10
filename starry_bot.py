@@ -9,7 +9,12 @@ from flask import Flask, request, jsonify, render_template
 
 load_dotenv() # gets the super duper secret api key shh
 
-app = Flask(__name__) 
+app = Flask(
+    __name__,
+    template_folder='docs',
+    static_folder='docs/static',
+    static_url_path='/static'
+)
 client = genai.Client()
 
 starry_instructions="""
