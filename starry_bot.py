@@ -10,9 +10,9 @@ from flask import Flask, request, jsonify, render_template
 load_dotenv() # gets the super duper secret api key shh
 
 app = Flask(
-    __name__,
-    template_folder='.',
-    static_folder='static',
+    __name__, 
+    template_folder=base_dir, 
+    static_folder=os.path.join(base_dir, 'static'), 
     static_url_path='/static'
 )
 client = genai.Client()
