@@ -7,11 +7,11 @@
     <link rel="icon" type="image/jpeg" href="static/starlit-stories-icon.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <!--nummy styleeee (pretend im drooling or something idk) -->
     <style>
         .page-shell {
-            --font: 'UnifrakturMaguntia', cursive;
+            --font: 'MedievalSharp', cursive;
             --border: #846C58;
             --glass: rgba(255, 255, 255, 0.08);
             font-family: var(--font);
@@ -220,9 +220,16 @@
 </body>
 <script>
     // this script handles the front end logic for the chat interface and story management~
-        let pages = JSON.parse(localStorage.getItem('starlit_pages')) || [ // array to hold the pages of the story
+        const defaultPages = [
             {id: null, title: "nameless ✶⋆.˚", historyHtml: "", ideas: ""}
         ];
+        let pages;
+        try {
+            pages = JSON.parse(localStorage.getItem('starlit_pages')) || defaultPages;
+        } catch (error) {
+            pages = defaultPages;
+            localStorage.removeItem('starlit_pages');
+        }
 
         function normalizeTitle(title) {
             return (title && title.trim()) ? title.trim() : 'nameless ✶⋆.˚';
@@ -380,7 +387,17 @@
                     body: formData
                 });
 
-                const data = await response.json();
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error(
+                        responseText.trim().startsWith('<')
+                            ? 'The chat backend is not running at this address. Start starry_bot.py and open its local URL.'
+                            : `Chat returned an invalid response (${response.status}).`
+                    );
+                }
                 if (!response.ok) {
                     throw new Error(data.response || `Chat request failed (${response.status})`);
                 }

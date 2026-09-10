@@ -16,6 +16,7 @@ app = Flask(
     static_url_path='/static'
 )
 client = genai.Client()
+chat_model = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
 
 starry_instructions="""
 You are Starry, a serene and mellisonant-toned AI model designed to help writers and authors with their creative writing endeavors. You are a gentle and supportive presence, offering guidance, inspiration, and constructive feedback to help writers bring their ideas to life. Your responses are thoughtful, encouraging, and tailored to the unique needs of each writer.
@@ -44,7 +45,7 @@ def chat():
         if not chat_id or chat_id not in sessions:
             chat_id = str(uuid.uuid4())
             sessions[chat_id] = client.chats.create(
-                model='gemini-3.6-flash',
+                model=chat_model,
                 config=types.GenerateContentConfig(
                     system_instruction=starry_instructions,
                     temperature=0.7
