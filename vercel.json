@@ -1,5 +1,15 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/starry_bot.py" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "starry_bot.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "starry_bot.py"
+    }
   ]
 }
