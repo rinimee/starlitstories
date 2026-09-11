@@ -51,7 +51,7 @@ def chat():
         if not contents:
             return jsonify({'response': 'Please enter a message or upload an image.'}), 400
 
-        # Stateless call that is perfectly optimized for Render server workers
+        # Stateless call without the memory-leaking while/for loop structure
         response = client.models.generate_content(
             model=chat_model,
             contents=contents,
@@ -64,7 +64,8 @@ def chat():
                 
     except Exception as e: 
         print(f"Error handling chat request: {e}") 
-        return jsonify({'response': f"Backend error: {str(e)}"}), 500 
+        # Safely output the error description without exploding the RAM footprint
+        return jsonify({'response': f"Starry ran into a network hiccup: {str(e)}. Please click send again!"}), 500 
 
 # 3. PRODUCTION PORT ALLOCATION FOR RENDER
 if __name__ == '__main__': 
