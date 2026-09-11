@@ -12,11 +12,11 @@ load_dotenv() # gets the super duper secret api key shh
 # 1. DEFINE BASE_DIR FIRST SO FLASK CAN USE IT
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask( 
-    __name__, 
-    template_folder=base_dir, 
-    static_folder=os.path.join(base_dir, 'static'), 
-    static_url_path='/static' 
+app = Flask(
+    __name__,
+    template_folder='templates',
+    static_folder=os.path.join(base_dir, 'static'),
+    static_url_path='/static'
 )
 
 # 2. FIXED API KEY FETCH: Looks for standard Render dashboard settings keys
