@@ -5,7 +5,7 @@
 > ### *want a picture? here!*
 > <img width="1366" height="768" alt="Capture" src="https://github.com/user-attachments/assets/681fe574-dcb3-45fd-9261-28ea39837767" />
 ### *try her out here!*
-> https://rinimee.github.io/starlitstories/
+> https://starlitstories-pi.vercel.app/
 >
 > . ݁₊ ⊹ . ݁ ⟡ ݁ . ⊹ ₊ ݁.
 > > ### *what can starry do? starry can...* 
